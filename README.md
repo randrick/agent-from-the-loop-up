@@ -18,7 +18,7 @@ The README at each tag has step-by-step instructions for that article.
 
 ## Articles
 
-1. An AI Agent From the Loop Up: Why I Built My Own (no code)
+1. [An AI Agent From the Loop Up: Why I Built My Own](https://www.linkedin.com/pulse/ai-agent-from-loop-up-why-i-built-my-own-ray-andrick-s9ife) (no code)
 
 ## Subscribe
 
