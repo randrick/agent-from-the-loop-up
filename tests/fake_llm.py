@@ -3,6 +3,7 @@
 # https://github.com/randrick/agent-from-the-loop-up
 # Copyright (c) 2026 Ray Andrick
 # SPDX-License-Identifier: MIT
+# Provided as is, in the hope that it is useful, with no warranty. See LICENSE.
 """A scripted stand-in for an LLM service, for testing loop.sh.
 
 It speaks just enough of the OpenAI-style chat completions API for the loop:

@@ -3,6 +3,7 @@
 # https://github.com/randrick/agent-from-the-loop-up
 # Copyright (c) 2026 Ray Andrick
 # SPDX-License-Identifier: MIT
+# Provided as is, in the hope that it is useful, with no warranty. See LICENSE.
 #
 # Live check for loop.sh: one trivial request through your real LLM. It
 # confirms that the API can be reached, the model exists, and the model can
@@ -10,7 +11,8 @@
 # the model said, because a real model words its answer differently every run.
 #
 # Usage:  tests/live.sh
-# Config: LLM_BASE_URL, LLM_MODEL and LLM_API_KEY, the same as loop.sh
+# Config: LLM_BASE_URL, LLM_MODEL, LLM_API_KEY and LLM_REASONING_EFFORT, the same
+#         as loop.sh
 # Exit:   0 if every check passed, 1 otherwise
 set -uo pipefail    # no -e: a failed check is counted, it does not stop the run
 

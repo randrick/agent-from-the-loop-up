@@ -3,10 +3,11 @@
 # https://github.com/randrick/agent-from-the-loop-up
 # Copyright (c) 2026 Ray Andrick
 # SPDX-License-Identifier: MIT
+# Provided as is, in the hope that it is useful, with no warranty. See LICENSE.
 #
 # Mechanics tests for loop.sh. They run the loop against fake_llm.py, a
 # scripted stand-in for the LLM service, so they need no model and no GPU.
-# They prove the loop does its own job. They say nothing about how a real
+# They check the loop's own mechanics. They say nothing about how a real
 # model behaves. For that, see live.sh.
 #
 # Usage: tests/run.sh
@@ -19,6 +20,12 @@ here=$(cd "$(dirname "$0")" && pwd)
 if [[ -x $here/../loop.sh ]]; then loop=$here/../loop.sh; else loop=$(command -v loop.sh); fi
 
 tmp=$(mktemp -d)
+
+# The loop is run with its stdin attached to this pipe, which stays open and
+# never delivers anything. A command that reads the loop's stdin would wait
+# forever, so case 10 fails if the loop stops giving commands an empty stdin.
+mkfifo "$tmp/stdin"
+exec 9<>"$tmp/stdin"
 fake_pid=
 cleanup() {
     [[ -n $fake_pid ]] && kill "$fake_pid" 2>/dev/null
@@ -72,7 +79,7 @@ run_case() {
     (cd "$work" && env -u LLM_API_KEY -u LLM_REASONING_EFFORT \
         ${key:+LLM_API_KEY="$key"} ${effort_off:+LLM_REASONING_EFFORT=} LLM_MODEL=fake \
         LLM_BASE_URL="http://127.0.0.1:$(cat "$tmp/port")/v1" \
-        timeout 20 "$loop" "$@" >"$tmp/out" 2>"$tmp/err")
+        timeout 20 "$loop" "$@" <&9 >"$tmp/out" 2>"$tmp/err")
     rc=$?
 
     kill "$fake_pid" 2>/dev/null

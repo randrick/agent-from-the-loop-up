@@ -14,6 +14,8 @@ cd agent-from-the-loop-up
 git checkout article-02
 ```
 
+Git then says you are in "detached HEAD" state. That is expected: you are looking at the code exactly as that article left it.
+
 The README at each tag has step-by-step instructions for that article.
 
 ## Prerequisites
@@ -58,9 +60,10 @@ Dockerfile           the container image the loop runs in
 tests/run.sh         mechanics tests, no LLM needed
 tests/fake_llm.py    the scripted stand-in for the LLM that those tests use
 tests/live.sh        one-request check against your real LLM
+docs/DESIGN.md       design notes for this stage, including its known limits
 ```
 
-**Warning:** the script runs whatever command the model asks for. Nothing in the script checks or limits it. The steps below run it inside a throwaway container, so the model's commands can only touch the container and one Docker volume. Don't skip the container.
+**Warning:** the script runs whatever command the model asks for. Nothing in the script checks or limits it. The steps below run it inside a throwaway container, so the only files the model's commands can touch are the container's and one Docker volume's. The container does not restrict the network: the commands can reach the internet and, with the Linux command, any service listening on your machine. Don't skip the container.
 
 ### Steps
 
@@ -102,9 +105,9 @@ tests/live.sh        one-request check against your real LLM
 What the flags do:
 
 - `--rm` deletes the container when the loop ends.
-- `--init` lets Ctrl-C stop the loop.
-- `-v stage0:/work` gives the loop a Docker volume named `stage0` as its working directory. The model's files land there and outlive the container. Nothing on your own machine is reachable from inside.
-- On Linux, `--network host` lets the container reach Ollama on `localhost`.
+- `--init` passes Ctrl-C to the loop. The loop stops when the step in progress finishes, so Ctrl-C cannot interrupt a command that hangs.
+- `-v stage0:/work` gives the loop a Docker volume named `stage0` as its working directory. The model's files land there and outlive the container. None of your own files are mounted into the container.
+- On Linux, `--network host` lets the container reach Ollama on `localhost`. It also lets the model's commands reach any other service listening on your machine.
 
 ### What you should see
 
@@ -207,10 +210,11 @@ The last line should read `Live check passed.`
 
 ### If something goes wrong
 
-- **`curl: (7) Failed to connect`**: the loop cannot reach the LLM. Check that Ollama answers with `curl http://localhost:11434/v1/models`. On Linux, check that you used the Linux command in step 3.
+- **`curl: (7) Failed to connect`**: the loop cannot reach the LLM. Check that Ollama answers with `curl http://localhost:11434/v1/models`.
+- **`curl: (6) Could not resolve host: host.docker.internal`**: you are on Linux and used the macOS and Windows command. Use the Linux command in step 3.
 - **`loop.sh: request failed:` followed by a message**: the LLM service refused the request, and the message is its reason. The common ones are a model name it does not know (pull the model, or check `LLM_MODEL`), a model that does not support tool calls (choose one that does) and a complaint about `reasoning_effort` (add `-e LLM_REASONING_EFFORT=` to the `docker run` command).
 - **The loop ends and prints nothing**: the model sent back neither text nor a command the loop could read. Run it again. If it keeps happening, try another model.
-- **The loop never ends**: nothing in this stage limits how long the model keeps going. Press Ctrl-C.
+- **The loop never ends**: nothing in this stage limits how long the model keeps going. Press Ctrl-C, and the loop stops when the step in progress finishes. If a command is hung, Ctrl-C cannot interrupt it: from another terminal, find the container with `docker ps` and stop it with `docker kill <container id>`.
 
 ### What has been tested
 
@@ -222,4 +226,4 @@ Pragmatic AI on LinkedIn: https://www.linkedin.com/build-relation/newsletter-fol
 
 ## License
 
-The code is under the MIT License; see [LICENSE](LICENSE). The license covers the code only. The article text is Copyright 2026 Ray Andrick, all rights reserved.
+The code is under the MIT License; see [LICENSE](LICENSE). It is provided as is, in the hope that it is useful, with no warranty of any kind. It runs commands chosen by an LLM, so use it at your own risk. The license covers the code only. The article text is Copyright 2026 Ray Andrick, all rights reserved.

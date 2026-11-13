@@ -2,10 +2,12 @@
 # https://github.com/randrick/agent-from-the-loop-up
 # Copyright (c) 2026 Ray Andrick
 # SPDX-License-Identifier: MIT
+# Provided as is, in the hope that it is useful, with no warranty. See LICENSE.
 #
 # A throwaway place to run loop.sh. The model's commands run inside this
-# container, so they can only touch the container and the one volume
-# mounted at /work. The model runs outside, behind an OpenAI-style API.
+# container, so the only files they can touch are the container's and the one
+# volume mounted at /work. The network is not restricted. The model runs
+# outside, behind an OpenAI-style API.
 #
 # On a Linux machine, loop.sh could run directly on the host. It runs in a
 # container here for two reasons:
@@ -18,7 +20,8 @@
 
 FROM debian:13-slim
 
-# What loop.sh needs (bash, curl, jq), plus python3 for the example task.
+# What loop.sh needs (bash, curl, jq), plus python3 for the example task and
+# the tests.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends bash ca-certificates curl jq python3 \
  && rm -rf /var/lib/apt/lists/*
