@@ -46,7 +46,7 @@ Thinking is off by default because Ollama is much faster that way with the model
 ## Articles
 
 1. [An AI Agent From the Loop Up: Why I Built My Own](https://www.linkedin.com/pulse/ai-agent-from-loop-up-why-i-built-my-own-ray-andrick-s9ife) (no code)
-2. The bare loop (tag `article-02`)
+2. [An AI Agent From the Loop Up: The Bare Loop](https://www.linkedin.com/pulse/ai-agent-from-loop-up-bare-ray-andrick-pssdc) (tag `article-02`)
 
 ## Article 2: the bare loop
 
